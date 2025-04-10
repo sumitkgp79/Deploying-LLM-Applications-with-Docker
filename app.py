@@ -2,22 +2,21 @@ import os
 
 import gradio as gr
 from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
-from llama_index.embeddings.mixedbreadai import MixedbreadAIEmbedding
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.groq import Groq
 from llama_parse import LlamaParse
 
 # API keys
 llama_cloud_key = os.environ.get("LLAMA_CLOUD_API_KEY")
 groq_key = os.environ.get("GROQ_API_KEY")
-mxbai_key = os.environ.get("MXBAI_API_KEY")
-if not (llama_cloud_key and groq_key and mxbai_key):
+if not (llama_cloud_key and groq_key):
     raise ValueError(
         "API Keys not found! Ensure they are passed to the Docker container."
     )
 
 # models name
 llm_model_name = "llama-3.1-70b-versatile"
-embed_model_name = "mixedbread-ai/mxbai-embed-large-v1"
+embed_model_name = "sentence-transformers/all-MiniLM-L6-v2"
 
 # Initialize the parser
 parser = LlamaParse(api_key=llama_cloud_key, result_type="markdown")
@@ -40,14 +39,14 @@ file_extractor = {
 }
 
 # Initialize the embedding model
-embed_model = MixedbreadAIEmbedding(api_key=mxbai_key, model_name=embed_model_name)
+embed_model = HuggingFaceEmbedding(model_name=embed_model_name)
 
 # Initialize the LLM
 
-llm = Groq(model="llama-3.1-70b-versatile", api_key=groq_key)
+llm = Groq(model="llama-3.1-8b-instant", api_key=groq_key)
 
 
-# File processing function
+# File processing function̦
 def load_files(file_path: str):
     global vector_index
     if not file_path:
